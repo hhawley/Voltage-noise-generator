@@ -26,63 +26,22 @@ void NoiseSimulation::Init(List2D& volt_spectra) {
 	_max_frequency = _amplitud_spectra->get_X()[_num_freqs - 1];
 
 	_dt = ListMath::Pi2() / (2.0*_max_frequency);
-	_total_time = 2.0*ListMath::Pi2() / (_amplitud_spectra->get_X()[0]);
+	_total_time = ListMath::Pi2() / (_amplitud_spectra->get_X()[0]);
 	_num_points = static_cast<unsigned int>(_total_time/_dt);
 
 	_output_signal = new double[2*_num_points];
 	RNG::setMaxValue(_num_points);
 
-	std::cout << "Max freq: " << _max_frequency << 's' << std::endl;
+	std::cout << "Max freq: " << _max_frequency / ListMath::Pi2() << "Hz" << std::endl;
+	std::cout << "Min freq: " << _amplitud_spectra->get_X()[0] / ListMath::Pi2() << "Hz" << std::endl;
 
 	std::cout << "Time jumps: " << _dt << 's' << std::endl;
 	std::cout << "Total time: " << _total_time << "s" << std::endl;
-	std::cout << "Total number of points: " << _num_points << std::endl;
+	std::cout << "Total number of points: " << _num_points << std::endl << std::endl;
+
 
 }
 
-List2D* NoiseSimulation::GenNoiseWaveForm() {
-
-	if(_output_signal == nullptr) {
-		throw "Class hasnt been initialized";
-	}
-
-	std::cout << "Starting simulation..." << std::endl;
-	memset(_output_signal, 0, 2*sizeof(double)*_num_points);
-
-	double* w_freqs = _amplitud_spectra->get_X();
-	double* amplitudes = _amplitud_spectra->get_Y();
-	double ran_amp = 0.0, phase_shift = 0.0;
-	for(unsigned int i = 0; i < _num_freqs; i++) {
-
-		double& curr_w = w_freqs[i];
-		double& curr_amp = amplitudes[i];
-
-		if(curr_amp < _minimum_filter_reduction) {
-			continue;
-		}
-
-		RNG::setSigma(curr_amp);
-		ran_amp = abs(RNG::getDoubleFloat());
-
-		if(ran_amp < _minimum_filter_reduction) {
-			continue;
-		}
-
-		phase_shift = ListMath::Pi2()*RNG::getDouble();
-
-		ListMath::addSineGeneral(_output_signal, _num_points, _dt, ran_amp, curr_w, phase_shift);
-
-	}
-
-	#pragma omp parallel for
-	for(unsigned int time_index = 0; time_index < _num_points; time_index++) {
-		_output_signal[time_index + _num_points] = time_index*_dt;
-	}
-
-	List2D* _output_waveForm = new List2D(_output_signal, _num_points);
-	return _output_waveForm;
-
-}
 
 void NoiseSimulation::__to_amplitude_spectra(List2D& volt_spectra) {
 
@@ -136,6 +95,131 @@ void NoiseSimulation::__to_amplitude_spectra(List2D& volt_spectra) {
 
 }
 
+List2D* NoiseSimulation::GenNoiseWaveForm(const int& dbFilter, const unsigned int& freq_threshold) {
+
+	if(_output_signal == nullptr) {
+		throw "Class hasnt been initialized";
+	}
+
+	std::cout << "Starting simulation..." << std::endl;
+	setFilterReductiondB(dbFilter);
+	memset(_output_signal, 0, 2*sizeof(double)*_num_points);
+
+	double* w_freqs = _amplitud_spectra->get_X();
+	double* amplitudes = _amplitud_spectra->get_Y();
+	double ran_amp = 0.0, phase_shift = 0.0;
+	for(unsigned int i = 0; i < _num_freqs; i++) {
+
+		double& curr_w = w_freqs[i];
+		double& curr_amp = amplitudes[i];
+
+		if(curr_amp < _minimum_filter_reduction) {
+			continue;
+		}
+
+		RNG::setSigma(curr_amp);
+		ran_amp = abs(RNG::getDoubleFloat());
+
+		if(ran_amp < _minimum_filter_reduction) {
+			continue;
+		}
+
+		phase_shift = ListMath::Pi2()*RNG::getDouble();
+
+		ListMath::addSineGeneral(_output_signal, _num_points, _dt, ran_amp, curr_w, phase_shift, freq_threshold);
+
+	}
+
+	#pragma omp parallel for
+	for(unsigned int time_index = 0; time_index < _num_points; time_index++) {
+		_output_signal[time_index + _num_points] = time_index*_dt;
+	}
+
+	List2D* _output_waveForm = new List2D(_output_signal, _num_points);
+	return _output_waveForm;
+
+}
+
+List2D* NoiseSimulation::GenNoiseWaveFormSpeed() {
+	if(_output_signal == nullptr) {
+		throw "Class hasnt been initialized";
+	}
+
+	std::cout << "Starting fast as possible simulation..." << std::endl;
+	setFilterReductiondB(-60);
+	memset(_output_signal, 0, 2*sizeof(double)*_num_points);
+
+	double* w_freqs = _amplitud_spectra->get_X();
+	double* amplitudes = _amplitud_spectra->get_Y();
+	double ran_amp = 0.0, phase_shift = 0.0;
+	for(unsigned int i = 0; i < _num_freqs; i++) {
+
+		double& curr_w = w_freqs[i];
+		double& curr_amp = amplitudes[i];
+
+		if(curr_amp < _minimum_filter_reduction) {
+			continue;
+		}
+
+		RNG::setSigma(curr_amp);
+		ran_amp = abs(RNG::getDoubleFloat());
+
+		if(ran_amp < _minimum_filter_reduction) {
+			continue;
+		}
+
+		phase_shift = ListMath::Pi2()*RNG::getDouble();
+
+		ListMath::addSineFast(_output_signal, _num_points, _dt, curr_amp, curr_w, phase_shift);
+
+	}
+
+	#pragma omp parallel for
+	for(unsigned int time_index = 0; time_index < _num_points; time_index++) {
+		_output_signal[time_index + _num_points] = time_index*_dt;
+	}
+
+	List2D* _output_waveForm = new List2D(_output_signal, _num_points);
+	return _output_waveForm;
+
+}
+
+List2D* NoiseSimulation::GenNoiseWaveFormPrecision() {
+	if(_output_signal == nullptr) {
+		throw "Class hasnt been initialized";
+	}
+
+	std::cout << "Starting precise as possible simulation..." << std::endl;
+	memset(_output_signal, 0, 2*sizeof(double)*_num_points);
+
+	double* w_freqs = _amplitud_spectra->get_X();
+	double* amplitudes = _amplitud_spectra->get_Y();
+	double ran_amp = 0.0, phase_shift = 0.0;
+	for(unsigned int i = 0; i < _num_freqs; i++) {
+
+		double& curr_w = w_freqs[i];
+		double& curr_amp = amplitudes[i];
+
+		RNG::setSigma(curr_amp);
+		ran_amp = abs(RNG::getDoubleFloat());
+		phase_shift = ListMath::Pi2()*RNG::getDouble();
+
+		ListMath::addSinePrecision(_output_signal, _num_points, _dt, ran_amp, curr_w, phase_shift);
+
+	}
+
+	#pragma omp parallel for
+	for(unsigned int time_index = 0; time_index < _num_points; time_index++) {
+		_output_signal[time_index + _num_points] = time_index*_dt;
+	}
+
+	List2D* _output_waveForm = new List2D(_output_signal, _num_points);
+	return _output_waveForm;
+
+}
+
+
+
 
 const double NoiseSimulation::getFilterReduction() {
 	return _minimum_filter_reduction;
@@ -149,6 +233,7 @@ void NoiseSimulation::setFilterReductiondB(const double& fRdB) {
 	if(_output_signal == nullptr) {
 		throw "Class hasnt been initialized";
 	}
+
 	_minimum_filter_reduction = exp(fRdB/20.0)*_max_amplitude;
 	std::cout << "dB filter: " << _minimum_filter_reduction << std::endl;
 	std::cout << "Max Amplitude: " << _max_amplitude << std::endl;

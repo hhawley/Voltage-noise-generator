@@ -28,6 +28,34 @@ To run the program just type in the console:
 
 If no OUTPUT_PATH and INPUT_PATH was included, it will try to use the default NSD found in `Noise Spectras` and it will output a csv file named `noise-example.csv` where the executable was found.
 
+## Three different modes:
+There are three different modes that you can use that depend on your needs: Fast, Precision, and mixed.
+
+# Fast.
+It uses look-up tables to calculate the sinewave to avoid using the sine function for all values. It works by, first, calculating the sinewave values for a complete period and saves it to an array, then it just adds those values to the time array by looping trough the table. The pseudo code can be seen here:
+```c++
+	void fastSine(double* arr, double w, double phase, double totalTime):
+		double* sineTable = new double[2pi/w];
+		for(i=0; i< 2pi/w; i++)
+			sineTable[i] = sine((w*i)+phase);
+
+		fpr(i=0; i<totalTime; i++)
+			arr[i] = sineTable[i% (2pi/w)];
+
+``` 
+For the real code look at `ListMath.cpp`.
+
+There is another approximation and that is by filtering amplitudes which are too small relative to the maximum amplitude. If the amplitud is `-60dB` down the maximum value, it will be ignored and we will jump right to the next frrequency. This is useful when dealing with NSD which peak at some value, and then quickly decade. 
+
+In order to use the fast method, uncomment `std::unique_ptr<List2D> waveForm ( Generator.GenNoiseWaveFormSpeed() );` in `line 62` in `debug_main.cpp`, and comment the rest.
+
+# Precision
+There is no filtering and no approximations. This is the default uncommented line in the code.
+
+# Mixed
+Combines both methods. You can set to which frequencies the look-up sine wave table method will execute instead of doing that for all frequencies, and set the minimum amplitude filtering in dB relative to the maximum value. In order to use the fast method, uncomment `std::unique_ptr<List2D> waveForm ( Generator.GenNoiseWaveForm(-80) );` in `line 61` in `debug_main.cpp`, and comment the rest. You can change the -80 to any negative dB value you want, and you can include an optional argument for the frequency look-up table approach.
+
+
 
 ## Test the output
 
@@ -40,13 +68,12 @@ Example of a graph output from the script:
 
 ## Errors in the simulation
 
-The simulation uses a sinewave table method which includes some errors which can be significant (higher than 1%) because of some non-linearities created from the sine wave table imperfections (it does not start where it ends). However, this is a good precision sacrifice as it can reduce the simulation time by 10. If you require very precise simulation, it is possible to change the source code to use the precise sinewave function found in `ListMath.cpp`.
+The simulation uses a sinewave table method, if used with the fast or mixed approach, which includes some errors which can be significant (higher than 1%) because of some non-linearities created from the sine wave table imperfections (it does not start where it ends). However, this is a good precision sacrifice as it can reduce the simulation time by 10. If you require very precise simulation, use the precise functions instead.
 
-There is an option found in `debug_main.cpp` found in `line 60` in a function called
-`setFilterReductiondB`. It takes a dB value, and then calculates which would be the minimum amplitude of a sinewave allowed, essentially filtering these values from the simulation. In my example, I use a filter than removes any amplitudes lower than `-80dB` in respect to maximum value found in the NSD. It helps improving the simulation the higher it is (closer to 0), but decreases precision.
 
 ## TODO:
 
 * Read and write to SQL/NoSQL databases.
 * Optimize (use OpenCL, perhaps?)
-* Add an option to choose between speed and precision.
+* Use a good FFT library instead of populating using sines.
+* Started writting some statistical functions in ListStatistics so in the future it would be possible to only use the python script to plot

@@ -3,8 +3,8 @@ import math
 import matplotlib.pyplot as plt
 import pandas as pd
 
-data = pd.read_csv("./output/noise-example.csv")
-dataNoiseDens = pd.read_csv("./Noise Spectras/noiseSpectra.csv", names=["freq", "data"])
+data = pd.read_csv("./output/noise-fast-example.csv")
+dataNoiseDens = pd.read_csv("./Noise Spectras/noiseSpectra.csv")
 
 dt = data["time"][1] - data["time"][0]
 
@@ -37,7 +37,7 @@ totalNoise = 0
 lastFrequency = 0
 lastVoltage = 0
 i = 0
-for ff, nV in zip(dataNoiseDens["freq"], dataNoiseDens["data"]):
+for ff, nV in zip(dataNoiseDens["frequency"], dataNoiseDens["V(onoise)"]):
 	
 	if i == 0:
 		lastFrequency = ff
@@ -55,7 +55,7 @@ print('\n')
 
 plt.figure(1)
 plt.subplot(211)
-plt.semilogx(freq, V_sqrtHz, dataNoiseDens["freq"], dataNoiseDens["data"])
+plt.semilogx(freq, V_sqrtHz, dataNoiseDens["frequency"], dataNoiseDens["V(onoise)"])
 plt.xlabel("Frequency")
 plt.ylabel("Std/Hz^1/2")
 

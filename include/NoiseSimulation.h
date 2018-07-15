@@ -13,7 +13,9 @@ public:
 	~NoiseSimulation();
 
 	void Init(List2D&);
-	List2D* GenNoiseWaveForm();
+	List2D* GenNoiseWaveFormSpeed();
+	List2D* GenNoiseWaveFormPrecision();
+	List2D* GenNoiseWaveForm(const int&, const unsigned int& freq_threshold=20);
 
 	const double getFilterReduction();
 	void setFilterReduction(const double&);

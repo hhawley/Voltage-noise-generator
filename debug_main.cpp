@@ -27,7 +27,7 @@ int main(int argc, char const *argv[])
 	switch(argc) {
 		case 2:
 			if(argv[1][0] != 0) {
-				df.from_csv("noiseSpectra.csv");
+				df.from_csv("../Noise Spectras/noiseSpectra.csv");
 				outputFile_dir = std::string(argv[1]);
 			}
 			break;
@@ -42,8 +42,8 @@ int main(int argc, char const *argv[])
 			break;
 
 		default:
-			outputFile_dir = "noise-example.csv";
-			df.from_csv("./Noise Spectras/noiseSpectra.csv");
+			outputFile_dir = "../output/noise-fast-example.csv";
+			df.from_csv("../Noise Spectras/noiseSpectra.csv");
 			break;
 	}
 
@@ -57,9 +57,10 @@ int main(int argc, char const *argv[])
 
 	time(&timer0);
 	Generator.Init(data);
-	Generator.setFilterReductiondB(-80.0);
 
-	std::unique_ptr<List2D> waveForm ( Generator.GenNoiseWaveForm() );
+	// std::unique_ptr<List2D> waveForm ( Generator.GenNoiseWaveForm(-80) );
+	// std::unique_ptr<List2D> waveForm ( Generator.GenNoiseWaveFormSpeed() );
+	std::unique_ptr<List2D> waveForm ( Generator.GenNoiseWaveFormPrecision() );
 
 	std::cout << "Finished simulation" << std::endl;
 	time(&timer1);

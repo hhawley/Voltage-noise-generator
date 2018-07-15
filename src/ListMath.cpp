@@ -45,6 +45,7 @@ List2D* ListMath::int2dTrapezoidal(List2D& list) {
 
 	List2D* outputList = new List2D(list.get_Length()-1);
 	outputList->clear();
+	
 	#pragma omp parallel for
 	for(unsigned int i = 0; i < list.get_Length()-1; i++) {
 
@@ -85,12 +86,14 @@ List2D* ListMath::invFft(List2D& list) {
 
 }
 
+
+
 void ListMath::addSineGeneral(double* in, const unsigned int& numpts, const double& dt, 
-		const double& amplitude, const double& w, const double& phase) {
+		const double& amplitude, const double& w, const double& phase, const unsigned int& freq_selc) {
 
 	unsigned int time_divs_freqs = static_cast<unsigned int>(Pi2() / (dt*w));
 
-	if(time_divs_freqs > 20) {
+	if(time_divs_freqs > freq_selc) {
 		double* sineWaveTable = new double[time_divs_freqs];
 
 		#pragma omp parallel for
@@ -112,6 +115,36 @@ void ListMath::addSineGeneral(double* in, const unsigned int& numpts, const doub
 		}
 	}
 
+}
+
+void ListMath::addSineFast(double* in, const unsigned int& numpts, const double& dt, 
+		const double& amplitude, const double& w, const double& phase) {
+
+	unsigned int time_divs_freqs = static_cast<unsigned int>(Pi2() / (dt*w));
+	double* sineWaveTable = new double[time_divs_freqs];
+
+	#pragma omp parallel for
+	for(unsigned int t = 0; t < time_divs_freqs; t++) {
+		sineWaveTable[t] = amplitude*sin(w*(t*dt)+phase);
+	}
+
+	#pragma omp parallel for
+	for(unsigned int t = 0; t < numpts; t++) {
+		in[t] += sineWaveTable[t % time_divs_freqs];
+	}
+
+	delete [] sineWaveTable;
+
+
+}
+
+void ListMath::addSinePrecision(double* in, const unsigned int& numpts, const double& dt, 
+		const double& amplitude, const double& w, const double& phase) {
+
+	#pragma omp parallel for
+	for(unsigned int t = 0; t < numpts; t++) {
+		in[t] += amplitude*sin(w*(t*dt)+phase);
+	}
 }
 
 

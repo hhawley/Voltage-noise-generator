@@ -1,4 +1,5 @@
-// g++ randomNoiseFromFFT.cpp RNG.cpp -O3 -lpthread -fopenmp -Wall -o FFTNoise.exe
+// g++ SingleFileDataSim.cpp RNG.cpp -O3 -lpthread -fopenmp -Wall -o FFTNoise.exe
+//g++ ../SingleFileDataSim.cpp ../src/RNG.cpp -O3 -lpthread -fopenmp -Wall -o FFTNoise.exe -I ../include/
 
 #include <iostream>
 #define _USE_MATH_DEFINES
@@ -47,7 +48,7 @@ double getMax(double* data, unsigned int size) {
 }
 
 inline double sinsin(double w, double phase, double t) {
-	return sin(w*(t-phase));
+	return sin((w*t)+phase);
 }
 
 int main(int argc, char const *argv[])
@@ -58,7 +59,7 @@ int main(int argc, char const *argv[])
 	switch(argc) {
 		case 2:
 			if(argv[1][0] != 0) {
-				inputFFT.open("noiseSpectra.csv");
+				inputFFT.open("../Noise Spectras/noiseSpectra.csv");
 				outputFile.open(std::string(argv[1]));
 			}
 			break;
@@ -73,8 +74,8 @@ int main(int argc, char const *argv[])
 			break;
 
 		default:
-			outputFile.open("./output/noise-example.csv");
-			inputFFT.open("noiseSpectra.csv", std::ios::binary | std::ios::in);
+			outputFile.open("../output/noise-sing-precision-example.csv");
+			inputFFT.open("../Noise Spectras/noiseSpectra.csv", std::ios::binary | std::ios::in);
 			break;
 	}
 
@@ -156,17 +157,9 @@ int main(int argc, char const *argv[])
 		for(unsigned int i = 0; i < NPSSize; i++) {
 			freq = NPSFreqs[i];
 
-			if(NPSVoltages[i] < maxNPSAmplitude / 1e3) {
-				continue;
-			}
 
 			RNG::setSigma(NPSVoltages[i]);
 			amplitude = RNG::getDoubleFloat();
-
-			if(abs(amplitude) <  maxNPSAmplitude / 1e3) {
-				continue;
-			}
-
 			phase_shift = M_PI_2*RNG::getDouble();
 
 			unsigned int time_divs_freq = static_cast<unsigned int>(2.0*M_PI/(dt*freq));
@@ -174,28 +167,28 @@ int main(int argc, char const *argv[])
 			// we should save one period of the sine wave to an array, and just repeat that
 			// similar to a look-up table approach
 			// otherwise, just calculate it for the time array/
-			if(time_divs_freq > 20) {
+			// if(time_divs_freq > 20) {
 
-				double* sineWaveBuffer = new double[time_divs_freq];
-				#pragma omp parallel for
-				for(unsigned int time_index = 0; time_index < time_divs_freq; time_index++) {
-					sineWaveBuffer[time_index] = amplitude*sinsin(freq, phase_shift, time_index*dt);
-					// sineWaveBuffer[time_index] = amplitude*sinsin(2*M_PI*10000, 0, time_index*dt);
-				}
+			// 	double* sineWaveBuffer = new double[time_divs_freq];
+			// 	#pragma omp parallel for
+			// 	for(unsigned int time_index = 0; time_index < time_divs_freq; time_index++) {
+			// 		sineWaveBuffer[time_index] = amplitude*sinsin(freq, phase_shift, time_index*dt);
+			// 		// sineWaveBuffer[time_index] = amplitude*sinsin(2*M_PI*10000, 0, time_index*dt);
+			// 	}
 
-				#pragma omp parallel for
-				for(unsigned int time_index = 0; time_index < numPoints; time_index++) {
-					voltageTimeArray[time_index] += sineWaveBuffer[time_index % time_divs_freq];
-				}
+			// 	#pragma omp parallel for
+			// 	for(unsigned int time_index = 0; time_index < numPoints; time_index++) {
+			// 		voltageTimeArray[time_index] += sineWaveBuffer[time_index % time_divs_freq];
+			// 	}
 
-				delete [] sineWaveBuffer;
+			// 	delete [] sineWaveBuffer;
 
-			} else {
+			// } else {
 				#pragma omp parallel for
 				for(unsigned int time_index = 0; time_index < numPoints; time_index++) {
 					voltageTimeArray[time_index] += amplitude*sinsin(freq, phase_shift, time_index*dt);
 				}
-			}
+			// }
 
 		}
 

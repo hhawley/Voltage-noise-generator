@@ -76,8 +76,15 @@ public:
 	static List2D* invFft(List2D& list);
 	// End FFT
 
+
 	static void addSineGeneral(double*, const unsigned int& numpts, const double& dt, 
+		const double& amplitude, const double& w, const double& phase, const unsigned int& freq_selc=20);
+	static void addSineFast(double*, const unsigned int& numpts, const double& dt, 
 		const double& amplitude, const double& w, const double& phase);
+	static void addSinePrecision(double*, const unsigned int& numpts, const double& dt, 
+		const double& amplitude, const double& w, const double& phase);
+
+
 	static double* sineGeneral(const unsigned int& numpts, const double& dt, 
 		const double& amplitude, const double& w, const double& phase);
 	static List2D* sineListGeneral(const unsigned int& numpts, const double& dt, 
