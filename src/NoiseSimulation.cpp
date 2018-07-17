@@ -108,6 +108,8 @@ List2D* NoiseSimulation::GenNoiseWaveForm(const int& dbFilter, const unsigned in
 	double* w_freqs = _amplitud_spectra->get_X();
 	double* amplitudes = _amplitud_spectra->get_Y();
 	double ran_amp = 0.0, phase_shift = 0.0;
+
+	#pragma omp parallel for reduction(+:_output_signal[:_num_points])
 	for(unsigned int i = 0; i < _num_freqs; i++) {
 
 		double& curr_w = w_freqs[i];
@@ -152,6 +154,8 @@ List2D* NoiseSimulation::GenNoiseWaveFormSpeed() {
 	double* w_freqs = _amplitud_spectra->get_X();
 	double* amplitudes = _amplitud_spectra->get_Y();
 	double ran_amp = 0.0, phase_shift = 0.0;
+
+	#pragma omp parallel for reduction(+:_output_signal[:_num_points])
 	for(unsigned int i = 0; i < _num_freqs; i++) {
 
 		double& curr_w = w_freqs[i];
@@ -195,6 +199,8 @@ List2D* NoiseSimulation::GenNoiseWaveFormPrecision() {
 	double* w_freqs = _amplitud_spectra->get_X();
 	double* amplitudes = _amplitud_spectra->get_Y();
 	double ran_amp = 0.0, phase_shift = 0.0;
+
+	#pragma omp parallel for reduction(+:_output_signal[:_num_points])
 	for(unsigned int i = 0; i < _num_freqs; i++) {
 
 		double& curr_w = w_freqs[i];

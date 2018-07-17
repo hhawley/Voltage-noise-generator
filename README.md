@@ -2,7 +2,10 @@
 
 This project is a simple C++ program that allows to transform the noise spectral densities from a comma separated file, csv (or any char separated file), created from SPICE simulations (for example, LTSpice) to a voltage-time csv.
 
-In this git everything is available to run the code in your client with no additional code or data. Using an example noise spectral density (NSD) found in `Noise Spectras` called `noiseSpectra.csv`.
+It was created with the purpose of simulating noise signals from any type of source (from electronics, or any types or noise spectra densities) for the analysis and prediction of experiments or products. 
+
+## How to Install
+In this git everything is available to run the code in your client with no additional libraries. Using an example noise spectral density (NSD) found in `Noise Spectras` called `noiseSpectra.csv`.
 
 To compile you can run on Linux:
 ```bash
@@ -20,6 +23,8 @@ cmake -G "MinGW Makefiles" ../
 mingw32-make.exe
 ```
 Make sure MinGW is in the PATH variable.
+
+There is only one prerequisite if using on Linux and OpenMP is that the GNU GCC compiler version has to be great than 6.0. Otherwise, the conflicting `#pragma` can be removed and it will compile. 
 
 ## Usage
 To run the program just type in the console:
@@ -55,8 +60,6 @@ There is no filtering and no approximations. This is the default uncommented lin
 # Mixed
 Combines both methods. You can set to which frequencies the look-up sine wave table method will execute instead of doing that for all frequencies, and set the minimum amplitude filtering in dB relative to the maximum value. In order to use the fast method, uncomment `std::unique_ptr<List2D> waveForm ( Generator.GenNoiseWaveForm(-80) );` in `line 61` in `debug_main.cpp`, and comment the rest. You can change the -80 to any negative dB value you want, and you can include an optional argument for the frequency look-up table approach.
 
-
-
 ## Test the output
 
 There is an included python script, `Compare.py`, that reads the output voltage-time file, and the NSD and output the variance for both files. It will also estimate the NSD from the voltage-time file and graph it along side the original NSD. Finally, it also plots the voltage-time signal.
@@ -75,5 +78,5 @@ The simulation uses a sinewave table method, if used with the fast or mixed appr
 
 * Read and write to SQL/NoSQL databases.
 * Optimize (use OpenCL, perhaps?)
-* Use a good FFT library instead of populating using sines.
-* Started writting some statistical functions in ListStatistics so in the future it would be possible to only use the python script to plot
+* Started writting some statistical functions in ListStatistics so in the future it would be possible to only use the python script to plot.
+* Add a feature to read from noise power spectras or noise spectras.

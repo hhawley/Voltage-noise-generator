@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
 			break;
 
 		default:
-			outputFile_dir = "../output/noise-fast-example.csv";
+			outputFile_dir = "noise-fast-example.csv";
 			df.from_csv("../Noise Spectras/noiseSpectra.csv");
 			break;
 	}
