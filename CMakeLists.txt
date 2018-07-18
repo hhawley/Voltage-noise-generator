@@ -10,6 +10,7 @@ src/ListMath.cpp
 src/ListStatistics.cpp
 src/NoiseSimulation.cpp
 src/RNG.cpp
+src/Options.cpp
 
 
 include/DataFrame.h

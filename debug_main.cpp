@@ -13,6 +13,8 @@
 #include "RNG.h"
 #include "ListMath.h"
 #include "NoiseSimulation.h"
+#include "Options.h"
+
 #include <time.h>
 #include <iostream>
 #include <memory>
@@ -21,32 +23,11 @@ int main(int argc, char const *argv[])
 {
 	NoiseSimulation Generator;
 	DataFrame<double> df;
-	std::string outputFile_dir;
 	time_t timer0, timer1;
 
-	switch(argc) {
-		case 2:
-			if(argv[1][0] != 0) {
-				df.from_csv("../Noise Spectras/noiseSpectra.csv");
-				outputFile_dir = std::string(argv[1]);
-			}
-			break;
+	Options::ReadParameters(argc, argv);
 
-		case 3:
-			if(argv[1][0] != 0) {
-				outputFile_dir = std::string(argv[1]);
-			}
-			if(argv[2][0] != 0) {
-				df.from_csv(argv[2]);
-			}
-			break;
-
-		default:
-			outputFile_dir = "noise-fast-example.csv";
-			df.from_csv("../Noise Spectras/noiseSpectra.csv");
-			break;
-	}
-
+	df.from_csv( Options::InputFileName() );
 	
 	// df.print();
 	std::cout << "Finished reading data file with " 
@@ -75,7 +56,7 @@ int main(int argc, char const *argv[])
 	}
 
 	// output_df.print();
-	output_df.to_csv(outputFile_dir, ',', 6);
+	output_df.to_csv( Options::OutputFileName() , ',', 6);
 	RNG::Clear();
 
 
