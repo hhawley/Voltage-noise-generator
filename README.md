@@ -29,9 +29,9 @@ There is only one prerequisite if using on Linux and OpenMP is that the GNU GCC 
 ## Usage
 To run the program just type in the console:
 
-    NOISEGEN [OUTPUT_PATH] [INPUT_PATH]
+    NOISEGEN -o [OUTPUT_PATH] -i [INPUT_PATH]
 
-If no OUTPUT_PATH and INPUT_PATH was included, it will try to use the default NSD found in `Noise Spectras` and it will output a csv file named `noise-example.csv` where the executable was found.
+If no OUTPUT_PATH and INPUT_PATH were included, it will try to use the default NSD found in `Noise Spectras` and it will output a csv file named `noise-example.csv` where the executable was found.
 
 ## Three different modes:
 There are three different modes that you can use that depend on your needs: Fast, Precision, and mixed.
