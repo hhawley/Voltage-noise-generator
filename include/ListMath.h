@@ -61,7 +61,9 @@ public:
 
 	// Basic Math functions
 	static double Max(double* list, unsigned int size);
+	static double AbsMax(double* list, unsigned int size);
 	static double Min(double* list, unsigned int size);
+	static double AbsMin(double* list, unsigned int size);
 	// End Basic
 
 	// Integration functions

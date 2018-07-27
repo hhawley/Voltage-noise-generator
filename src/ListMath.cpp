@@ -1,4 +1,5 @@
 #include "ListMath.h"
+#include <cmath>
 
 double ListMath::Max(double* list, unsigned int size) {
 	double maxVal = 0.0;
@@ -11,11 +12,33 @@ double ListMath::Max(double* list, unsigned int size) {
 	return maxVal;
 }
 
+double ListMath::AbsMax(double* list, unsigned int size) {
+	double maxVal = 0.0;
+	for(unsigned int i = 0; i < size; i++){
+		if(list[i] > maxVal) {
+			maxVal = fabs(list[i]);
+		}
+	}
+
+	return maxVal;
+}
+
 double ListMath::Min(double* list, unsigned int size) {
-	double minVal = 0.0;
+	double minVal = 1e99;
 	for(unsigned int i = 0; i < size; i++){
 		if(list[i] < minVal) {
 			minVal = list[i];
+		}
+	}
+
+	return minVal;
+}
+
+double ListMath::AbsMin(double* list, unsigned int size) {
+	double minVal = 1e99;
+	for(unsigned int i = 0; i < size; i++){
+		if(list[i] < minVal) {
+			minVal = fabs(list[i]);
 		}
 	}
 

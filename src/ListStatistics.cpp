@@ -70,7 +70,7 @@ double  ListStatistics::cdf_tstudent_dist(const double& x, const unsigned int& n
 
 double ListStatistics::inv_cdf_standard_dist(const double& alpha, const double& mean, const double& std){
 
-	double z= alpha*std*sqrt(ListMath::Pi2());
+	double z = alpha*std*sqrt(ListMath::Pi2());
 	double log_z = log(z);
 	double q = sqrt(-2*log_z);
 
