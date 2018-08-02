@@ -4,7 +4,7 @@ double ListStatistics::meanList(List2D& list){
 
 	double mean = 0.0;
 	unsigned int n  =  list.get_Length();
-	double* vals = list.get_Y();
+	double* vals = list.get_X();
 
 	#pragma omp parallel for reduction(+:mean)
 	for(unsigned int i = 0; i < n; i++) {
@@ -26,7 +26,7 @@ double ListStatistics::stdList(List2D& list){
 	double std = 0.0, plc_holder = 0.0;
 	double mean = meanList(list);
 	unsigned int n = list.get_Length();
-	double* vals = list.get_Y();
+	double* vals = list.get_X();
 
 	#pragma omp parallel for reduction(+:std)
 	for(unsigned int i = 0; i < n; i++) {

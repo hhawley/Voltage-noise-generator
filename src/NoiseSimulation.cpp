@@ -26,7 +26,7 @@ void NoiseSimulation::Init(List2D& volt_spectra) {
 	_max_frequency = _amplitud_spectra->get_X()[_num_freqs - 1];
 
 	_dt = ListMath::Pi2() / (2.0*_max_frequency);
-	_total_time = ListMath::Pi2() / (_amplitud_spectra->get_X()[0]);
+	_total_time = 10*ListMath::Pi2() / (_amplitud_spectra->get_X()[0]);
 	_num_points = static_cast<unsigned int>(_total_time/_dt);
 
 	_output_signal = new double[2*_num_points];
@@ -101,7 +101,7 @@ List2D* NoiseSimulation::GenNoiseWaveForm(const int& dbFilter, const unsigned in
 		throw "Class hasnt been initialized";
 	}
 
-	std::cout << "Starting simulation..." << std::endl;
+	// std::cout << "Starting simulation..." << std::endl;
 	setFilterReductiondB(dbFilter);
 	memset(_output_signal, 0, 2*sizeof(double)*_num_points);
 
@@ -147,7 +147,7 @@ List2D* NoiseSimulation::GenNoiseWaveFormSpeed() {
 		throw "Class hasnt been initialized";
 	}
 
-	std::cout << "Starting fast as possible simulation..." << std::endl;
+	// std::cout << "Starting fast as possible simulation..." << std::endl;
 	setFilterReductiondB(-60);
 	memset(_output_signal, 0, 2*sizeof(double)*_num_points);
 
@@ -193,7 +193,7 @@ List2D* NoiseSimulation::GenNoiseWaveFormPrecision() {
 		throw "Class hasnt been initialized";
 	}
 
-	std::cout << "Starting precise as possible simulation..." << std::endl;
+	// std::cout << "Starting precise as possible simulation..." << std::endl;
 	memset(_output_signal, 0, 2*sizeof(double)*_num_points);
 
 	double* w_freqs = _amplitud_spectra->get_X();
@@ -241,6 +241,6 @@ void NoiseSimulation::setFilterReductiondB(const double& fRdB) {
 	}
 
 	_minimum_filter_reduction = exp(fRdB/20.0)*_max_amplitude;
-	std::cout << "dB filter: " << _minimum_filter_reduction << std::endl;
-	std::cout << "Max Amplitude: " << _max_amplitude << std::endl;
+	// std::cout << "dB filter: " << _minimum_filter_reduction << std::endl;
+	// std::cout << "Max Amplitude: " << _max_amplitude << std::endl;
 }
